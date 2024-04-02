@@ -1,0 +1,29 @@
+name: 'Conventional Commits and Task ID Linter'
+description: 'Checks commits for conventional commit format and a Task ID'
+runs:
+  using: "composite"
+  steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+          fetch-depth: 0  # Important to fetch all history for all branches and tags
+
+    - name: Check for Conventional Commits
+      shell: bash
+      run: |
+        echo "Fetching all commits from the push..."
+        COMMITS=$(git log ${{ github.event.before }}..${{ github.sha }} --pretty=format:"%H")
+
+        echo "Checking each commit for Conventional Commit compliance..."
+        for COMMIT in $COMMITS
+        do
+            COMMIT_MSG=$(git log -1 --pretty=format:"%s" $COMMIT)
+            if ! echo "$COMMIT_MSG" | grep -Eq "^(feat|fix|docs|style|refactor|perf|test|chore|ci): [a-zA-Z0-9 ]+$"; then
+              echo "Commit $COMMIT does not follow the Conventional Commits specification: $COMMIT_MSG"
+              exit 1
+            else
+              echo "Commit $COMMIT is a Conventional Commit: $COMMIT_MSG"
+            fi
+          done
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
