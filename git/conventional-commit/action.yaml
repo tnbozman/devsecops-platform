@@ -1,5 +1,5 @@
-name: 'Conventional Commits and Task ID Linter'
-description: 'Checks commits for conventional commit format and a Task ID'
+name: 'Conventional Commits'
+description: 'Checks commits for conventional commit format'
 runs:
   using: "composite"
   steps:
